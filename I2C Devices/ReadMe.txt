@@ -1,0 +1,1 @@
+I built an I2C board with a DS1307 RTC clock breakout and a BMP085 temperature and pressure breakout plugged into it. It also has pins to link to other I2C devices. I got the spacing wrong on the first go so had to add an extra row of sockets for each device, the stripboard layout has been corrected though.

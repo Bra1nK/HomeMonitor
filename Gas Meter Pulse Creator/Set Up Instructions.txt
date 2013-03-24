@@ -1,0 +1,7 @@
+It took a while to get this one right. 
+
+My Gas Meter is the rotating counter type which has a small mirror in the number 6 on the lowest denominator and the detector needs to be aligned to pick this up. 
+
+I found the best way to set up was to turn up the detector's IR Led brightness fairly high then reduce the threshold adjust till the mirror was just being picked up (I had 4 rings on my gas hob running to get a decent throughput of gas !) I then backed off the detector's Led brightness control till the Led indicating a pulse went out (it tends to stay on once the mirror has been detected). 
+
+Perhaps a more careful choice of component values would make this easier.

@@ -1,0 +1,3 @@
+I found that using the LM35 with longish cable runs (even using copper core shielded Cat 5) resulted in erratic temperature readings till I added various passive filtering components. Short runs (a few feet) were no problem and no additional filtering was required.
+
+I've also noticed that using the Arduino with an external (admittedly cheap) PSU also produces erratic readings (although less so than the long cable), it's fine when run off a PC's usb port. I will shortly be starting a project to improve the quality of the cheapo wall warts output with regulation and smoothing. The erratic readings occured with both a 12v wall wart and a 5v usb plug output wall wart.
