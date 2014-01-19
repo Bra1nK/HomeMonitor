@@ -25,10 +25,7 @@
 #define RETRY_LIMIT 5     // Maximum number of times to retry
 #define ACK_TIME 10       // Number of milliseconds to wait for an ack
 
- typedef struct {
-          int data;              // data received
- } Payload;
- Payload rx;
+ byte rx[66];    // Buffer for received data (max size is 66 Bytes)
 
  int nodeID;    //node ID of tx, extracted from RF datapacket. Not transmitted as part of Payload structure
 
@@ -48,12 +45,14 @@
 //--------------------------------------------------------------------------------------------------
 // Send payload data via RF
 //-------------------------------------------------------------------------------------------------
- static void rfwrite(){
+// length is size of received data just transmit that part of the buffer
+
+ static void rfwrite(byte length){
   #ifdef USE_ACK
    for (byte i = 0; i <= RETRY_LIMIT; ++i) {  // tx and wait for ack up to RETRY_LIMIT times
       while (!rf12_canSend())
       rf12_recvDone();
-      rf12_sendStart(RF12_HDR_ACK, &rx, sizeof rx, 1); //4th parameter is wait for completion
+      rf12_sendStart(RF12_HDR_ACK, &rx, length, 1); //4th parameter is wait for completion
       byte acked = waitForAck();  // Wait for ACK
       if (acked) { return; }      // Return if ACK received  
    delay(RETRY_PERIOD * 1000);    // If no ack received wait and try again
@@ -61,7 +60,7 @@
   #else
      while (!rf12_canSend())
      rf12_recvDone();
-     rf12_sendStart(0, &rx, sizeof rx, 1); //4th parameter is wait for completion
+     rf12_sendStart(0, &rx, length, 1); //4th parameter is wait for completion
      return;
   #endif
  }
@@ -75,16 +74,17 @@ void setup () {
 void loop() {
 
  if (rf12_recvDone() && rf12_crc == 0 && (rf12_hdr & RF12_HDR_CTL) == 0) {
-  nodeID = rf12_hdr & 0x1F;  // get node ID
+  byte hdr = rf12_hdr, len = rf12_len;
+  nodeID = hdr & 0x1F;  // get node ID
 
-  rx = *(Payload*) rf12_data;
+  memcpy(rx, (void*) rf12_data, len);
    
    if (RF12_WANTS_ACK) {                  // Send ACK if requested
      rf12_sendStart(RF12_ACK_REPLY, 0, 0, 1); //4th parameter is wait for completion
    }   
 
    rf12_initialize(nodeID, freq, Tgroup); // Initialise the RFM12B for relaying
-   rfwrite(); // Send data via RF
+   rfwrite(len); // Send received data via RF
    rf12_initialize(MYNODE, freq, group); // Initialise the RFM12B for receiving again
  }
 }
