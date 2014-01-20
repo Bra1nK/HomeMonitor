@@ -27,7 +27,7 @@
 
  byte rx[66];    // Buffer for received data (max size is 66 Bytes)
 
- int nodeID;    //node ID of tx, extracted from RF datapacket.
+ int nodeID;    //node ID of transmitting node, extracted from RF datapacket.
 
 // Wait a few milliseconds for proper ACK
  #ifdef USE_ACK
@@ -43,9 +43,9 @@
  #endif
 
 //--------------------------------------------------------------------------------------------------
-// Send payload data via RF
-//-------------------------------------------------------------------------------------------------
+// Send received data via RF
 // length is size of received data just transmit that part of the buffer
+//-------------------------------------------------------------------------------------------------
 
  static void rfwrite(byte length){
   #ifdef USE_ACK
@@ -79,14 +79,14 @@ void loop() {
   
   nodeID = hdr & 0x1F;  // get node ID
 
-  memcpy(rx, (void*) rf12_data, len); //copy received data to byte array rx
+  memcpy(rx, (void*) rf12_data, len); //copy received data to buffer rx
    
-   if (RF12_WANTS_ACK) {                  // Send ACK to transmitting if requested
+   if (RF12_WANTS_ACK) {                      // Send ACK to transmitting node if requested
      rf12_sendStart(RF12_ACK_REPLY, 0, 0, 1); //4th parameter is wait for completion
    }   
 
-   rf12_initialize(nodeID, freq, Tgroup); // Initialise the RFM12B for relaying
-   rfwrite(len); // Send received data via RF
-   rf12_initialize(MYNODE, freq, group); // Initialise the RFM12B for receiving again
+   rf12_initialize(nodeID, freq, Tgroup);     // Initialise the RFM12B for relaying
+   rfwrite(len);                              // Send received data via RF
+   rf12_initialize(MYNODE, freq, group);      // Initialise the RFM12B for receiving again
  }
 }
