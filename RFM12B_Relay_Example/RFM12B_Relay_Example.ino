@@ -27,7 +27,7 @@
 
  byte rx[66];    // Buffer for received data (max size is 66 Bytes)
 
- int nodeID;    //node ID of tx, extracted from RF datapacket. Not transmitted as part of Payload structure
+ int nodeID;    //node ID of tx, extracted from RF datapacket.
 
 // Wait a few milliseconds for proper ACK
  #ifdef USE_ACK
@@ -74,12 +74,14 @@ void setup () {
 void loop() {
 
  if (rf12_recvDone() && rf12_crc == 0 && (rf12_hdr & RF12_HDR_CTL) == 0) {
+  
   byte hdr = rf12_hdr, len = rf12_len;
+  
   nodeID = hdr & 0x1F;  // get node ID
 
-  memcpy(rx, (void*) rf12_data, len);
+  memcpy(rx, (void*) rf12_data, len); //copy received data to byte array rx
    
-   if (RF12_WANTS_ACK) {                  // Send ACK if requested
+   if (RF12_WANTS_ACK) {                  // Send ACK to transmitting if requested
      rf12_sendStart(RF12_ACK_REPLY, 0, 0, 1); //4th parameter is wait for completion
    }   
 
